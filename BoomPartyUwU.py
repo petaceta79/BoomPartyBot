@@ -6,6 +6,7 @@ import pyperclip
 import cv2
 import numpy as np
 from PIL import Image
+import unicodedata
 
 # Variables 
 palabras_devueltas = []
@@ -40,11 +41,15 @@ def rellenar(tiempoesp, realista, tiemporealista):
     if(realista):
         for i in range(len(textA)):
             time.sleep(tiemporealista)
-            pyautogui.write(textA[i])
+            pyautogui.write(reemplazar_ñ_y_quitar_acentos(textA[i]))
     else:
-        pyautogui.write(textA)
+        pyautogui.write(reemplazar_ñ_y_quitar_acentos(textA))
     pyautogui.press('enter')
     print("Escrita: " + textA)
+def reemplazar_ñ_y_quitar_acentos(texto):
+    texto = texto.replace('ñ', 'n')
+    texto_sin_acentos = ''.join((c for c in unicodedata.normalize('NFD', texto) if unicodedata.category(c) != 'Mn'))
+    return texto_sin_acentos
 def DevPalabra(subcadena):
     global palabras_devueltas
     # Abre el archivo de texto y lee las palabras con la codificacion que requiera
