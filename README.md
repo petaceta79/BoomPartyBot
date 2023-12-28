@@ -9,3 +9,5 @@ You can choose between 2 modes, realistic and fast. Realistic lets you write slo
 After that, you have to specify how much time the program waits before active.
 Next to it you have to put the mouse where the letters are.
 Finally, you have to put the mouse where the bar to write appears but when the bar is off.
+
+Libraries (pip install pyautogui time pyperclip opencv-python numpy pillow unicodedata)
