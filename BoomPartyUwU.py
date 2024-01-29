@@ -7,6 +7,8 @@ import cv2
 import numpy as np
 from PIL import Image
 import unicodedata
+import random
+
 
 # Variables 
 palabras_devueltas = []
@@ -27,20 +29,22 @@ def seleccionar_y_copiar_texto():
     pyautogui.click(clicks=2)
     pyautogui.hotkey('ctrl', 'c')
     return pyperclip.paste()
-def rellenar(tiempoesp, realista, tiemporealista):
+def rellenar(tiempoesp, realista, tiemporealista, timepoMove):
+    tiempoMoveRan = random.uniform(timepoMove-0.05, timepoMove+0.05)
+
     time.sleep(tiempoesp)
-    pyautogui.moveTo(posiciones[0])
+    pyautogui.moveTo(posiciones[0], duration=tiempoMoveRan)
     time.sleep(tiempoesp)
     texto = seleccionar_y_copiar_texto()
     texto = texto.lower()
     time.sleep(tiempoesp)
-    pyautogui.moveTo(posiciones[1])
+    pyautogui.moveTo(posiciones[1], duration=tiempoMoveRan)
     pyautogui.click()
     time.sleep(tiempoesp)
     textA = DevPalabra(texto)
     if(realista):
         for i in range(len(textA)):
-            time.sleep(tiemporealista)
+            time.sleep(random.uniform(tiemporealista-0.001, tiemporealista+0.001))
             pyautogui.write(reemplazar_ñ_y_quitar_acentos(textA[i]))
     else:
         pyautogui.write(reemplazar_ñ_y_quitar_acentos(textA))
@@ -91,5 +95,5 @@ print("activo")
 
 while True:
     if CompJugar(posiciones[1], colorPixel):
-        rellenar(0.1, realista, 0.007)
+        rellenar(0.1, realista, 0.007, 0.1)
     time.sleep(0.5)
