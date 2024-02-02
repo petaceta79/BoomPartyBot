@@ -54,19 +54,19 @@ def reemplazar_ñ_y_quitar_acentos(texto):
     texto = texto.replace('ñ', 'n')
     texto_sin_acentos = ''.join((c for c in unicodedata.normalize('NFD', texto) if unicodedata.category(c) != 'Mn'))
     return texto_sin_acentos
-import random
 def DevPalabra(subcadena):
     global palabras_devueltas
     # Abre el archivo de texto y lee las palabras con la codificacion que requiera
     with open('diccionario.txt', 'r', encoding='utf-8') as f:
         diccionario = [line.strip() for line in f]
-    palabras_posibles = [palabra for palabra in diccionario if palabra.startswith(subcadena) and palabra not in palabras_devueltas]
+    palabras_posibles = [palabra for palabra in diccionario if subcadena in palabra and palabra not in palabras_devueltas]
     if palabras_posibles:
         palabra_elegida = random.choice(palabras_posibles)
         palabras_devueltas.append(palabra_elegida)
         return palabra_elegida
     else:
         return "No se encontraron más palabras con " + subcadena
+
 def optenerPixColor(pos, timepos):
     print("Opteniendo pixel para saber cuando jugar")
     time.sleep(timepos)
