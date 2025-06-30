@@ -1,61 +1,28 @@
 "https://jklm.fun/"
 
-import pyautogui
-import time
-import pyperclip
-import cv2
-import numpy as np
-from PIL import Image
+
 import unicodedata
 import random
+import time
+
+
+from selenium import webdriver
+from selenium.webdriver.common.by import By
+from selenium.webdriver.common.keys import Keys
+from selenium.webdriver.edge.options import Options
 
 
 # Variables 
 palabras_devueltas = []
 
 # Funciones---------------------------------------------
-def optenerPosiciones(timepoEspera):
-    posicones = []
-    print("Opteniendo posicion texto")
-    time.sleep(timepoEspera)
-    posicones.append(pyautogui.position())
-    print("ya")
-    print("Opteniendo posicon escribir")
-    time.sleep(timepoEspera)
-    posicones.append(pyautogui.position())
-    print("ya")
-    return posicones
-def seleccionar_y_copiar_texto():
-    pyautogui.click(clicks=2)
-    pyautogui.hotkey('ctrl', 'c')
-    return pyperclip.paste()
-def rellenar(tiempoesp, realista, tiemporealista, timepoMove):
-    tiempoMoveRan = random.uniform(timepoMove-0.05, timepoMove+0.05)
-
-    time.sleep(tiempoesp)
-    pyautogui.moveTo(posiciones[0], duration=tiempoMoveRan)
-    time.sleep(tiempoesp)
-    texto = seleccionar_y_copiar_texto()
-    texto = texto.lower()
-    time.sleep(tiempoesp)
-    pyautogui.moveTo(posiciones[1], duration=tiempoMoveRan)
-    pyautogui.click()
-    time.sleep(tiempoesp)
-    textA = DevPalabra(texto)
-    if(realista):
-        for i in range(len(textA)):
-            time.sleep(random.uniform(tiemporealista-0.001, tiemporealista+0.001))
-            pyautogui.write(reemplazar_ñ_y_quitar_acentos(textA[i]))
-    else:
-        pyautogui.write(reemplazar_ñ_y_quitar_acentos(textA))
-    pyautogui.press('enter')
-    print("Escrita: " + textA)
-def reemplazar_ñ_y_quitar_acentos(texto):
+def arreglarWord(texto):
     texto = texto.replace('ñ', 'n')
     texto_sin_acentos = ''.join((c for c in unicodedata.normalize('NFD', texto) if unicodedata.category(c) != 'Mn'))
     return texto_sin_acentos
 def DevPalabra(subcadena):
     global palabras_devueltas
+    subcadena = subcadena.lower()
     # Abre el archivo de texto y lee las palabras con la codificacion que requiera
     with open('diccionario.txt', 'r', encoding='utf-8') as f:
         diccionario = [line.strip() for line in f]
@@ -67,35 +34,69 @@ def DevPalabra(subcadena):
     else:
         return "No se encontraron más palabras con " + subcadena
 
-def optenerPixColor(pos, timepos):
-    print("Opteniendo pixel para saber cuando jugar")
-    time.sleep(timepos)
-    colorpixel = pyautogui.pixel(pos.x, pos.y)
-    print("ya")
-    return colorpixel
-def CompJugar(pos, colorPixel):
-    return (colorPixel != pyautogui.pixel(pos.x, pos.y))
-
 
 # Codigo---------------------------------------------
 print("BoomPartyUwU by PetaZ")
 
-realista = False
-print("Para realista pon 1 cualquier otro rápido")
-if(input("") == "1"):
-    realista = True
+options = Options()
+driver = webdriver.Chrome(options=options)
 
-print("timepo antes de activarse")
-tiempoActi = int(input())
+driver.get("https://jklm.fun")
+
+
+mode = 0
+sec = 0
+print("1: modo instantaneo, 2: modo realista")
+while (mode != 1.0 and mode != 2.0):
+    mode = float(input("Introduce el modo: "))
+    if (mode == 2):
+        sec = float(input("Segundos entre teclas (rec 0.05) : "))
+
+
+
+print("para cerrar Control + C en la terminal")
+input("Entra en la sala y dale Enter")
+
 
 time.sleep(1)
-posiciones = optenerPosiciones(2)
-colorPixel = optenerPixColor(posiciones[1], 0.1)
+print("Activo")
 
-time.sleep(tiempoActi)
-print("activo")
+
+iframe = driver.find_element(By.CSS_SELECTOR, "iframe[src*='bombparty']")
+driver.switch_to.frame(iframe)  
+
 
 while True:
-    if CompJugar(posiciones[1], colorPixel):
-        rellenar(0.1, realista, 0.007, 0.1)
-    time.sleep(0.5)
+
+    round_div = driver.find_element(By.CLASS_NAME, "round") # Cuando round no tenga hidden empieza
+
+    while (round_div.get_attribute("hidden") == None):
+
+        self_turn_div = driver.find_element(By.CLASS_NAME, "selfTurn") # Cuando selfTurn no tenga hidden nos toca
+        
+        if self_turn_div.get_attribute("hidden") == None:
+            # Obtener el texto 
+            syllable_div = driver.find_element(By.CLASS_NAME, "syllable") 
+            syllable_text = syllable_div.text.strip()
+
+            # Encontrar el input dentro de selfTurn 
+            input_box = self_turn_div.find_element(By.TAG_NAME, "input")
+
+            word = arreglarWord(DevPalabra(syllable_text)) # Obtener la palabra del diccionario
+
+            if (mode == 1):
+                input_box.send_keys(word + Keys.ENTER)
+            else:
+                time.sleep(sec*2)
+                for letra in word:
+                    input_box.send_keys(letra)
+                    time.sleep(sec*random.randint(1, 2))
+                input_box.send_keys(Keys.ENTER)
+            
+
+            print(syllable_text + " -> " + word)
+            break
+
+
+    time.sleep(0.1)
+
