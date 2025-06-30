@@ -47,3 +47,7 @@ Selecciona el modo de juego:
 Entra manualmente en una sala de BombParty en [https://jklm.fun/](https://jklm.fun/), luego vuelve a la terminal y presiona **Enter**.
 
 El bot comenzará a funcionar automáticamente cuando inicie tu turno.
+
+# Ejemplo
+![Ejemplo](ejemplos/gifExemplo.gif)
+
